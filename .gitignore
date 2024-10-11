@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 
 # Ignore virtual environment directories
-venv/
 env/
 *.env
 

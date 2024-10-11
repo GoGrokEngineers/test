@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from apps.task.models import Task
 import uuid
 import datetime
 import random, string
@@ -9,12 +9,13 @@ import random, string
 class Competition(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False) # it will be uid
     participants = models.IntegerField()
-    # difficulty = models.CharField(max_length=100) # it can be choice
+    difficulty = models.CharField(max_length=50, default='Easy') # it can be choice
     # topic = models.CharField(max_length=100) # it can be choice
     six_digit_link = models.CharField(max_length=6, unique=True, blank=True) # it can be deleted
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     duration = models.DurationField(default=datetime.timedelta(hours=1))
+    task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     def save(self, *args, **kwargs):
@@ -30,11 +31,11 @@ class Competition(models.Model):
         return f"{self.id}"
     
 
-class Participant(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-    has_completed = models.BooleanField(default=False)
-    submission_time = models.DateTimeField(null=True, blank=True)
+# class Participant(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+#     has_completed = models.BooleanField(default=False)
+#     submission_time = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.user.username} in {self.competition}"
+#     def __str__(self):
+#         return f"{self.user.username} in {self.competition}"

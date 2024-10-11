@@ -1,0 +1,6 @@
+# Put data to database
+
+# python manage.py shell
+# from data_probs.import_problems import import_tasks_from_csv
+# import_tasks_from_csv('data_probs/leetcode.csv')
+
