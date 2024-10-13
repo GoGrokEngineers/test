@@ -1,8 +1,0 @@
-# Build the docker image
-docker build -t gogrok-app .
-
-
-@ Run the docker container
-docker run -it gogrok-app
-
-

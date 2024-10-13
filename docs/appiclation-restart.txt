@@ -1,0 +1,10 @@
+@ Build the docker image
+docker build -t gogrok-app .
+
+
+@ Run the docker container
+docker run -p 8000:8000 gogrok-app
+
+
+@ To stop docker container
+docker stop gogrok-app
