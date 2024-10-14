@@ -2,12 +2,7 @@ from rest_framework import serializers
 from .models import Competition
 import random
 import string
-from apps.task.models import Task
-
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = ['id', 'title', 'difficulty']
+from apps.task.serializers import TaskSerializer
 
 
 class CompetitionSerializer(serializers.ModelSerializer):

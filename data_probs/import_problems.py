@@ -8,5 +8,6 @@ def import_tasks_from_csv(file_path):
         for row in reader:
             Task.objects.get_or_create(
                 title=row['title'],
+                description = row['description'],
                 difficulty=row['difficulty']
             )
