@@ -15,7 +15,7 @@ class CompetitionSerializer(serializers.ModelSerializer):
             'created_at',
             'six_digit_link',
             'is_active',
-            'duration',
+            'duration_minutes',
         ]
 
     def create(self, validated_data):

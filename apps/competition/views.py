@@ -33,6 +33,7 @@ class CompetitionCreateView(generics.CreateAPIView):
             'id': competition.id,
             'link': competition.six_digit_link,
             'task': TaskSerializer(competition.task).data,
+            'duration': competition.duration_minutes,
             'message': 'Competition created successfully!'
         }, status=status.HTTP_201_CREATED)
     
@@ -41,4 +42,5 @@ class CompetitionListView(generics.ListAPIView):
     queryset = Competition.objects.all()  
     serializer_class = CompetitionSerializer 
 
+    
 
