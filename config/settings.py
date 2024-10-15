@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apps.competition',
+    'corsheaders',
     'apps.task',
     'apps.test_case',
 ]
