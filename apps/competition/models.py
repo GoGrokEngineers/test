@@ -4,7 +4,6 @@ import uuid
 import datetime
 import random, string
 from django.utils import timezone
-# Create your models here.
 
 DIFFICULTY_CHOICES = [
         ('Easy', 'Easy'),
@@ -33,14 +32,12 @@ class Competition(models.Model):
     duration_minutes = models.IntegerField(choices=DURATION_CHOICES, blank=False, null=False)
     task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True, blank=True)
 
-
     def save(self, *args, **kwargs):
 
         if not self.six_digit_link:
             self.six_digit_link = self.generate_six_digit_link()
         super().save(*args, **kwargs)
         self.update_is_active()
-
 
     def generate_six_digit_link(self):
         return ''.join(random.choices(string.digits, k=6))

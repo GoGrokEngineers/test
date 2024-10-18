@@ -1,46 +1,51 @@
-from rest_framework import generics
-from rest_framework.response import Response
+import time
 from rest_framework import status
-from .models import Competition
-from .serializers import CompetitionSerializer, TaskSerializer
-from apps.task.models import Task
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.core.cache import cache
+from utils.generate_uid import generator 
 
-import random
+class CompetitionCreateView(APIView):
+    def post(self, request):
+        DIFFICULTY_CHOICES = {"Easy": "Easy", "Medium": "Medium", "Hard": "Hard"}
+        DURATION_CHOICES = {30: 30, 40: 40, 60: 60, 90: 90} 
+
+        try:
+            difficulty = DIFFICULTY_CHOICES[request.data.get("difficulty")]
+            duration = DURATION_CHOICES[request.data.get("duration")]
+            capacity = request.data.get("duration")
+
+            competition_uid = generator()
+
+            competition_data = {
+                "participants": {},
+                "results": {},
+                "difficulty": difficulty,
+                "duration": duration,
+                "capacity": capacity,
+                "created_at": time.time(),
+            }
+
+            cache.set(competition_uid, competition_data, timeout=duration*60)
+
+            return Response({
+                "success": True,
+                "competition_uid": competition_uid,
+                "message": "Competition created successfully."
+            }, status=status.HTTP_201_CREATED)
+
+        except KeyError as ex:
+            return Response({"success": False, "error": f"Invalid value: {str(ex)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Create your views here.
+class JoinAPIView(APIView):
+    def post(self, request):
+        competion = cache.get(request.data.get("competion_uid"))
+        if len(competion["participants"]) > competion["capacity"]:
+            return Response({"success": False, "error": f"Competion already full filled!"}, status=status.HTTP_400_BAD_REQUEST)
 
-class CompetitionCreateView(generics.CreateAPIView):
-    queryset = Competition.objects.all()
-    serializer_class = CompetitionSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        competition = serializer.save() 
-
-        difficulty = request.data.get('difficulty')
-        tasks = Task.objects.filter(difficulty=difficulty)
-
-        if not tasks.exists():
-            return Response({'error': 'No tasks available for the selected difficulty'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Randomly assign a task from the filtered tasks
-        task = random.choice(tasks)
-
-        competition = serializer.save(task=task)  # Save competition with the assigned task
-        return Response({
-            'id': competition.id,
-            'link': competition.six_digit_link,
-            'task': TaskSerializer(competition.task).data,
-            'duration': competition.duration_minutes,
-            'message': 'Competition created successfully!'
-        }, status=status.HTTP_201_CREATED)
+        user_uid = request.data.get("user_uid")
+        #loading
     
 
-class CompetitionListView(generics.ListAPIView):
-    queryset = Competition.objects.all()  
-    serializer_class = CompetitionSerializer 
-
-    
-
+        
