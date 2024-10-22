@@ -11,7 +11,6 @@ competitions_list = []
 class CompetitionCreateView(APIView):
 
     def get(self, request):
-        # Retrieve all competition UIDs from Redi
 
         # Serialize all competitions
         serialized_data = CompetitionSerializer(competitions_list, many=True).data
@@ -29,10 +28,10 @@ class CompetitionCreateView(APIView):
             # Generate a unique ID for the competition
             competition_uid = generator()
 
-            # Prepare competition data for Redis
+            
             competition_data = {
                 "competition_uid": competition_uid,
-                **serializer.validated_data,  # Use validated data from serializer
+                **serializer.validated_data,  
                 "created_at": timezone.now(),
             }
 
