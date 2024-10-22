@@ -1,32 +1,45 @@
-import time
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.cache import cache
-from utils.generate_uid import generator 
+from apps.competition.utils.generate_uid import generator 
+from .serializers import CompetitionSerializer
+from django.utils import timezone
 
+
+competitions_list = []
 class CompetitionCreateView(APIView):
+
+    def get(self, request):
+        # Retrieve all competition UIDs from Redi
+
+        # Serialize all competitions
+        serialized_data = CompetitionSerializer(competitions_list, many=True).data
+
+        return Response({
+            "success": True,
+            "competitions": serialized_data,
+            "message": "Competitions retrieved successfully."
+        }, status=status.HTTP_200_OK)
+
     def post(self, request):
-        DIFFICULTY_CHOICES = {"Easy": "Easy", "Medium": "Medium", "Hard": "Hard"}
-        DURATION_CHOICES = {30: 30, 40: 40, 60: 60, 90: 90} 
 
-        try:
-            difficulty = DIFFICULTY_CHOICES[request.data.get("difficulty")]
-            duration = DURATION_CHOICES[request.data.get("duration")]
-            capacity = request.data.get("duration")
-
+        serializer = CompetitionSerializer(data=request.data)
+        if serializer.is_valid():
+            # Generate a unique ID for the competition
             competition_uid = generator()
 
+            # Prepare competition data for Redis
             competition_data = {
-                "participants": {},
-                "results": {},
-                "difficulty": difficulty,
-                "duration": duration,
-                "capacity": capacity,
-                "created_at": time.time(),
+                "competition_uid": competition_uid,
+                **serializer.validated_data,  # Use validated data from serializer
+                "created_at": timezone.now(),
             }
 
-            cache.set(competition_uid, competition_data, timeout=duration*60)
+            # Store the competition data in Redis cache
+            cache.set(competition_uid, competition_data, timeout=competition_data["duration"] * 60)
+
+            competitions_list.append(competition_data)
 
             return Response({
                 "success": True,
@@ -34,8 +47,9 @@ class CompetitionCreateView(APIView):
                 "message": "Competition created successfully."
             }, status=status.HTTP_201_CREATED)
 
-        except KeyError as ex:
-            return Response({"success": False, "error": f"Invalid value: {str(ex)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"success": False, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class JoinAPIView(APIView):

@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import CompetitionCreateView, CompetitionListView
+from .views import CompetitionCreateView, JoinAPIView
 
 urlpatterns = [
-    path('create/', CompetitionCreateView.as_view(), name='create-competition'),
-    path('get/', CompetitionListView.as_view(), name='list-competitions'),
+    path('create/', CompetitionCreateView.as_view(), name='create-competition')
+    # path('join/', JoinAPIView.as_view(), name='join-competition')
+    
 ]
