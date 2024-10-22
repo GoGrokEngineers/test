@@ -1,0 +1,5 @@
+# Run redis server
+
+# redis-server
+# redis-cli
+# MONITOR
